@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define QTD_MAX_BYTES 1000
-
 int cria_palavra_secreta(char *palavra, int tam)
 {
     srand((unsigned)time(NULL));
