@@ -21,7 +21,7 @@ int cria_palavra_secreta(char *palavra, int tam)
 
 int main()
 {
-    int servers[] = {9734, 9734};
+    int servers[] = {9734, 9735};
     int qtd_servers = sizeof(servers) / sizeof(servers[0]);
 
     int sockfd[qtd_servers];

@@ -33,12 +33,16 @@ int main()
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
     char str_in[5000];
+    int server_port;
+
+    printf("Digite a porta desse servidor: ");
+    scanf("%d", &server_port);
 
     // Configurando conexão Socket
     server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-    server_address.sin_port = htons(9734);
+    server_address.sin_port = htons(server_port);
 
     // Bind na conexão
     server_len = sizeof(server_address);
