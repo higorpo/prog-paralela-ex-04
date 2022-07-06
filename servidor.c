@@ -58,11 +58,8 @@ int main()
 
         read(client_sockfd, &str_in, 5000);
 
-        printf("Texto recebido: %s\n", str_in);
-
         chute = malloc(sizeof(char) * strlen(str_in));
         descobrir_texto(str_in);
-        printf("chute: %s\n", chute);
 
         write(client_sockfd, chute, strlen(chute));
 

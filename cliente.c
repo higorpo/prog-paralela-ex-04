@@ -28,6 +28,7 @@ int main()
     int len[qtd_servers];
     struct sockaddr_in address[qtd_servers];
     int result[qtd_servers];
+
     int tamanho_palavra;
     char palavra_descoberta[5000];
 
@@ -46,13 +47,8 @@ int main()
     char *palavra_para_descobrir = malloc(sizeof(char) * tamanho_palavra);
     cria_palavra_secreta(palavra_para_descobrir, tamanho_palavra);
 
-    printf("Palavra secreta: %s\n", palavra_para_descobrir);
-
     // Divide a palavra em segmentos de acordo com a quantidade de servidores disponíveis
-    printf("Quantidade de segmentos: %d\n", qtd_servers);
-
     int max_bytes = tamanho_palavra / qtd_servers;
-    printf("Quantidade máxima de bytes por segmento %d\n", max_bytes);
 
     char segmentos[qtd_servers][max_bytes];
 
@@ -62,7 +58,6 @@ int main()
         strncpy(substring, &palavra_para_descobrir[i * max_bytes], max_bytes);
         substring[max_bytes] = '\0';
 
-        printf("Segmento %d: %s\n", i, substring);
         strcpy(segmentos[i], substring);
     }
 
@@ -101,7 +96,6 @@ int main()
         printf("Recebendo dados do servidor %d - %d\n", servers[i], i);
         read(sockfd[i], &str_out, 5000);
 
-        printf("Dado recebido do servidor: %s\n", str_out);
         strncat(palavra_descoberta, str_out, strlen(str_out));
         close(sockfd[i]);
     }
@@ -111,6 +105,6 @@ int main()
     double t_total = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1000000.0);
 
     printf("Mensagem descoberta: %s\n", palavra_descoberta);
-    printf("Tempo para execução: %lf+", t_total);
+    printf("Tempo para execução: %lf+\n", t_total);
     exit(0);
 }
