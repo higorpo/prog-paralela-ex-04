@@ -21,10 +21,13 @@ int cria_palavra_secreta(char *palavra, int tam)
 
 int main()
 {
-    int sockfd;
-    int len;
-    struct sockaddr_in address;
-    int result;
+    int servers[] = {9734, 9734};
+    int qtd_servers = sizeof(servers) / sizeof(servers[0]);
+
+    int sockfd[qtd_servers];
+    int len[qtd_servers];
+    struct sockaddr_in address[qtd_servers];
+    int result[qtd_servers];
     int tamanho_palavra;
     char palavra_descoberta[5000];
 
@@ -60,25 +63,42 @@ int main()
     }
 
     // Configurando socket
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    address.sin_port = htons(9734);
-
-    len = sizeof(address);
-    result = connect(sockfd, (struct sockaddr *)&address, len);
-
-    if (result == -1)
+    for (int i = 0; i < qtd_servers; i++)
     {
-        perror("oops: não foi possível se conectar via socket");
-        exit(1);
+        printf("Conectando-se via socket com o servidor %d - %d\n", servers[i], i);
+        sockfd[i] = socket(AF_INET, SOCK_STREAM, 0);
+        address[i].sin_family = AF_INET;
+        address[i].sin_addr.s_addr = inet_addr("127.0.0.1");
+        address[i].sin_port = htons(servers[i]);
+
+        len[i] = sizeof(address);
+        result[i] = connect(sockfd[i], (struct sockaddr *)&address[i], len[i]);
+
+        if (result[i] == -1)
+        {
+            perror("oops: não foi possível se conectar via socket\n");
+            exit(1);
+        }
     }
 
     // Enviando dados
-    write(sockfd, segmentos[0], 1024);
+    for (int i = 0; i < qtd_servers; i++)
+    {
+        printf("Enviando dados para o servidor %d - %d\n", servers[i], i);
+        write(sockfd[i], segmentos[0], 1024);
+    }
 
-    read(sockfd, &palavra_descoberta, 1024);
-    printf("mensagem do servidor: %s\n", palavra_descoberta);
-    close(sockfd);
+    // Recebendo dados
+    for (int i = 0; i < qtd_servers; i++)
+    {
+        char palavrinha[5000];
+        printf("Recebendo dados do servidor %d - %d\n", servers[i], i);
+        read(sockfd[i], &palavrinha, 1024);
+
+        printf("Dado recebido do servidor: %s\n", palavrinha);
+        close(sockfd[i]);
+    }
+
+    // printf("mensagem do servidor: %s\n", palavra_descoberta);
     exit(0);
 }
