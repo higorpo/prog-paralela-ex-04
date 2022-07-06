@@ -32,8 +32,7 @@ int main()
 
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
-    char str_in[1024];
-    char str_out[1024];
+    char str_in[5000];
 
     // Configurando conexão Socket
     server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -53,16 +52,17 @@ int main()
         client_len = sizeof(client_address);
         client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, &client_len);
 
-        read(client_sockfd, &str_in, 1024);
+        read(client_sockfd, &str_in, 5000);
 
         printf("Texto recebido: %s\n", str_in);
 
-        chute = malloc(sizeof(char) * sizeof(str_in));
+        chute = malloc(sizeof(char) * strlen(str_in));
         descobrir_texto(str_in);
         printf("chute: %s\n", chute);
 
-        write(client_sockfd, chute, 1024);
+        write(client_sockfd, chute, strlen(chute));
 
+        free(chute);
         close(client_sockfd);
     }
 }

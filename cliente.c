@@ -35,6 +35,12 @@ int main()
     printf("Digite o tamanho da palavra a ser descoberta: ");
     scanf("%d", &tamanho_palavra);
 
+    if (tamanho_palavra > 5000)
+    {
+        printf("Tamanho de palavra muito grande, o máximo é 5000. Enviando 5000 como parâmetro.\n");
+        tamanho_palavra = 5000;
+    }
+
     // palavra_descoberta = malloc(sizeof(char) * tamanho_palavra);
 
     char *palavra_para_descobrir = malloc(sizeof(char) * tamanho_palavra);
@@ -42,21 +48,19 @@ int main()
 
     printf("Palavra secreta: %s\n", palavra_para_descobrir);
 
-    // Divide a palavra em vários segmentos de até 1000 bytes.
-    int qtd_segmentos = tamanho_palavra / QTD_MAX_BYTES;
+    // Divide a palavra em segmentos de acordo com a quantidade de servidores disponíveis
+    printf("Quantidade de segmentos: %d\n", qtd_servers);
 
-    printf("Quantidade de segmentos: %d\n", qtd_segmentos);
+    int max_bytes = tamanho_palavra / qtd_servers;
+    printf("Quantidade máxima de bytes por segmento %d\n", max_bytes);
 
-    if (qtd_segmentos < 1)
-        qtd_segmentos = 1;
+    char segmentos[qtd_servers][max_bytes];
 
-    char segmentos[qtd_segmentos][QTD_MAX_BYTES];
-
-    for (int i = 0; i < qtd_segmentos; i++)
+    for (int i = 0; i < qtd_servers; i++)
     {
-        char substring[QTD_MAX_BYTES];
-        strncpy(substring, &palavra_para_descobrir[i * QTD_MAX_BYTES], QTD_MAX_BYTES);
-        substring[QTD_MAX_BYTES] = '\0';
+        char substring[max_bytes];
+        strncpy(substring, &palavra_para_descobrir[i * max_bytes], max_bytes);
+        substring[max_bytes] = '\0';
 
         printf("Segmento %d: %s\n", i, substring);
         strcpy(segmentos[i], substring);
@@ -85,20 +89,21 @@ int main()
     for (int i = 0; i < qtd_servers; i++)
     {
         printf("Enviando dados para o servidor %d - %d\n", servers[i], i);
-        write(sockfd[i], segmentos[0], 1024);
+        write(sockfd[i], segmentos[i], max_bytes);
     }
 
     // Recebendo dados
+    char str_out[5000];
     for (int i = 0; i < qtd_servers; i++)
     {
-        char palavrinha[5000];
         printf("Recebendo dados do servidor %d - %d\n", servers[i], i);
-        read(sockfd[i], &palavrinha, 1024);
+        read(sockfd[i], &str_out, 5000);
 
-        printf("Dado recebido do servidor: %s\n", palavrinha);
+        printf("Dado recebido do servidor: %s\n", str_out);
+        strncat(palavra_descoberta, str_out, strlen(str_out));
         close(sockfd[i]);
     }
 
-    // printf("mensagem do servidor: %s\n", palavra_descoberta);
+    printf("Mensagem descoberta: %s\n", palavra_descoberta);
     exit(0);
 }
