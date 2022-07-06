@@ -5,13 +5,15 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 char *chute;
 
 char descobrir_texto(char textoParaDescobrir[1024])
 {
-    chute[sizeof(textoParaDescobrir) - 1] = '\0';
-    for (int i = 0; i < sizeof(textoParaDescobrir); i++)
+    int texto_size = strlen(textoParaDescobrir);
+    chute[texto_size - 1] = '\0';
+    for (int i = 0; i < texto_size; i++)
         for (int j = 0; j < 255; j++)
         {
             chute[i] = j;
@@ -51,10 +53,13 @@ int main()
 
         read(client_sockfd, &str_in, 1024);
 
-        chute = malloc(sizeof(char) * sizeof(str_in));
-        printf(chute);
+        printf("Texto recebido: %s\n", str_in);
 
-        sprintf(str_out, "%s cruel\n", str_in);
+        chute = malloc(sizeof(char) * sizeof(str_in));
+        descobrir_texto(str_in);
+        printf("chute: %s\n", chute);
+
+        sprintf(str_out, "%s", str_in);
 
         write(client_sockfd, &str_out, 1024);
 

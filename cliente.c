@@ -25,24 +25,13 @@ int main()
     struct sockaddr_in address;
     int result;
     int tamanho_palavra;
+    char *palavra_descoberta;
 
     // Lendo dados para enviar
     printf("Digite o tamanho da palavra a ser descoberta: ");
     scanf("%d", &tamanho_palavra);
 
-    // Configurando socket
-    // sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    // address.sin_family = AF_INET;
-    // address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    // address.sin_port = htons(9734);
-
-    // result = connect(sockfd, (struct sockaddr *)&address, sizeof(address));
-
-    // if (result == -1)
-    // {
-    //     perror("oops: não foi possível se conectar via socket");
-    //     exit(1);
-    // }
+    palavra_descoberta = malloc(sizeof(char) * tamanho_palavra);
 
     char *palavra_para_descobrir = malloc(sizeof(char) * tamanho_palavra);
     cria_palavra_secreta(palavra_para_descobrir, tamanho_palavra);
@@ -69,10 +58,25 @@ int main()
         strcpy(segmentos[i], substring);
     }
 
-    // write(sockfd, &palavra_para_descobrir, 1024);
+    // Configurando socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    address.sin_port = htons(9734);
 
-    // read(sockfd, &str, 1024);
-    // printf("mensagem do servidor: %s\n", str);
-    // close(sockfd);
-    // exit(0);
+    result = connect(sockfd, (struct sockaddr *)&address, sizeof(address));
+
+    if (result == -1)
+    {
+        perror("oops: não foi possível se conectar via socket");
+        exit(1);
+    }
+
+    // Enviando dados
+    write(sockfd, &segmentos[0], 1024);
+
+    read(sockfd, &palavra_descoberta, tamanho_palavra);
+    printf("mensagem do servidor: %s\n", palavra_descoberta);
+    close(sockfd);
+    exit(0);
 }
