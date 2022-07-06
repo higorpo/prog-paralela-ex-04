@@ -24,6 +24,8 @@ int main()
     int servers[] = {9734, 9735};
     int qtd_servers = sizeof(servers) / sizeof(servers[0]);
 
+    struct timeval t1, t2;
+
     int sockfd[qtd_servers];
     int len[qtd_servers];
     struct sockaddr_in address[qtd_servers];
@@ -85,6 +87,8 @@ int main()
         }
     }
 
+    gettimeofday(&t1, NULL);
+
     // Enviando dados
     for (int i = 0; i < qtd_servers; i++)
     {
@@ -104,6 +108,11 @@ int main()
         close(sockfd[i]);
     }
 
+    gettimeofday(&t2, NULL);
+
+    double t_total = (t2.tv_sec - t1.tv_sec) + ((t2.tv_usec - t1.tv_usec) / 1000000.0);
+
     printf("Mensagem descoberta: %s\n", palavra_descoberta);
+    printf("Tempo para execução: %lf+", t_total);
     exit(0);
 }
