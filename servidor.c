@@ -28,7 +28,7 @@ char descobrir_texto(char textoParaDescobrir[1024])
 int main()
 {
     int server_sockfd, client_sockfd;
-    int client_len;
+    int server_len, client_len;
 
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
@@ -42,14 +42,16 @@ int main()
     server_address.sin_port = htons(9734);
 
     // Bind na conexão
-    bind(server_sockfd, (struct sockaddr *)&server_address, sizeof(server_address));
+    server_len = sizeof(server_address);
+    bind(server_sockfd, (struct sockaddr *)&server_address, server_len);
     listen(server_sockfd, 5);
 
     while (1)
     {
         printf("Server waiting\n");
 
-        client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, sizeof(client_address));
+        client_len = sizeof(client_address);
+        client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, &client_len);
 
         read(client_sockfd, &str_in, 1024);
 
@@ -59,9 +61,7 @@ int main()
         descobrir_texto(str_in);
         printf("chute: %s\n", chute);
 
-        sprintf(str_out, "%s", str_in);
-
-        write(client_sockfd, &str_out, 1024);
+        write(client_sockfd, chute, 1024);
 
         close(client_sockfd);
     }

@@ -22,16 +22,17 @@ int cria_palavra_secreta(char *palavra, int tam)
 int main()
 {
     int sockfd;
+    int len;
     struct sockaddr_in address;
     int result;
     int tamanho_palavra;
-    char *palavra_descoberta;
+    char palavra_descoberta[5000];
 
     // Lendo dados para enviar
     printf("Digite o tamanho da palavra a ser descoberta: ");
     scanf("%d", &tamanho_palavra);
 
-    palavra_descoberta = malloc(sizeof(char) * tamanho_palavra);
+    // palavra_descoberta = malloc(sizeof(char) * tamanho_palavra);
 
     char *palavra_para_descobrir = malloc(sizeof(char) * tamanho_palavra);
     cria_palavra_secreta(palavra_para_descobrir, tamanho_palavra);
@@ -64,7 +65,8 @@ int main()
     address.sin_addr.s_addr = inet_addr("127.0.0.1");
     address.sin_port = htons(9734);
 
-    result = connect(sockfd, (struct sockaddr *)&address, sizeof(address));
+    len = sizeof(address);
+    result = connect(sockfd, (struct sockaddr *)&address, len);
 
     if (result == -1)
     {
@@ -73,9 +75,9 @@ int main()
     }
 
     // Enviando dados
-    write(sockfd, &segmentos[0], 1024);
+    write(sockfd, segmentos[0], 1024);
 
-    read(sockfd, &palavra_descoberta, tamanho_palavra);
+    read(sockfd, &palavra_descoberta, 1024);
     printf("mensagem do servidor: %s\n", palavra_descoberta);
     close(sockfd);
     exit(0);
